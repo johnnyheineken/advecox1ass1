@@ -19,3 +19,23 @@ print('This is the Python output for Assignment 1, Advanced Econometrics 1 for s
 N = 20
 r = 3
 beta = 1
+cov_matrix2 = cov_matrix2 * sigma_z
+cov_matrix2[:, 0] = (r + 2) * [gamma]
+cov_matrix2[0, :] = (r + 2) * [gamma]
+cov_matrix2[0, 0] = 1
+cov_matrix2[1, 1] = 1
+cov_matrix2[0, 1] = ro
+cov_matrix2[1, 0] = ro
+print(cov_matrix2)
+
+
+
+# defined as three values = [u, v, epsilon]
+
+errors_vector = np.random.multivariate_normal(mean=[0, 0, 0],
+                                              cov=cov_matrix,
+                                              size=N)
+
+z = errors_vector[:,2]
+
+print(z)
