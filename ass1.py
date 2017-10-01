@@ -1,3 +1,9 @@
+#%%
+
+
+
+#%%
+
 import numpy as np
 from sklearn import linear_model
 import math
@@ -5,6 +11,8 @@ from numpy.linalg import *
 from numpy import transpose as t
 import matplotlib.pyplot as plt
 
+
+#%%
 
 studentname1 = 'Jan Hynek'
 studentname2 = 'Štěpán Svoboda'
