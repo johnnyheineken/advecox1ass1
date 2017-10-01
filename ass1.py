@@ -27,7 +27,7 @@ print('This is the Python output for Assignment 1, Advanced Econometrics 1 for s
 N = 20
 r = 3
 beta = 1
-cov_matrix2 = cov_matrix2 * sigma_z
+cov_matrix2 = np.identity(r + 2) * sigma_z
 cov_matrix2[:, 0] = (r + 2) * [gamma]
 cov_matrix2[0, :] = (r + 2) * [gamma]
 cov_matrix2[0, 0] = 1
