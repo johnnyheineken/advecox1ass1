@@ -11,7 +11,7 @@ studentname1 = 'Jan Hynek'
 studentname2 = 'Štěpán Svoboda'
 studentnumber1 = 1189
 studentnumber2 = 1188  # ŠTĚPÁNE NEZAPOMEŃ ZMĚNIT ČÍSLO
-np.random.seed(studentnumber1 + 10 * 1488)
+np.random.seed(studentnumber1 + 10 * studentnumber2)
 print('This is the Python output for Assignment 1, Advanced Econometrics 1 for students: \n' +
       '   (1) ' + studentname1 + ' - ' + str(studentnumber1) + '\n' +
       '   (2) ' + studentname2 + ' - ' + str(studentnumber2) + '\n\n' +
@@ -50,7 +50,7 @@ def errors(cov_matrix):
     return np.matrix(errors_vector)
 
 
-def monte_carlo(sigma_z, gamma, ro, pi):
+def iteration(sigma_z, gamma, ro, pi):
     error_matrix = errors(cov_matrix(sigma_z, gamma, ro))
     # u = error_matrix[:, 0]
     # v = error_matrix[:, 1]
@@ -68,11 +68,16 @@ def monte_carlo(sigma_z, gamma, ro, pi):
     ##########################
     # Ordinary least squares #
     ##########################
+    # we do not fit intercept as we know that our original model does not have intercept.
+    # however, we think that in monte carlo simulation it wont make a difference if the intercept would be zero
+    # as it is estimated as almost zero
     regression_ols = linear_model.LinearRegression(fit_intercept=False)
     regression_ols.fit(X=X, y=y)
     b_hat_ols = regression_ols.coef_
+    # b_hat_ols2 = inv(t(X) * X) * t(X) * y
+    # print(b_hat_ols - b_hat_ols2)
     u_hat_ols = y - X * b_hat_ols
-    Omega_hat_ols = np.diag(u_hat_ols.A1)
+    Omega_hat_ols = np.diag(np.power(u_hat_ols.A1, 2))
     Var_b_ols = (inv(t(X) * X) * t(X) *
                  Omega_hat_ols *
                  X * inv(t(X) * X))
@@ -94,25 +99,40 @@ def monte_carlo(sigma_z, gamma, ro, pi):
     u_hat_2sls = y - X * b_hat_2sls
 
     # obtaining variance
-    Omega_hat_2sls = np.diag(u_hat_2sls.A1)
+    Omega_hat_2sls = np.diag(np.power(u_hat_2sls.A1, 2))
 
     # S_hat = (t(Z) * Omega_hat_2sls * Z) / N
     Var_b_2sls = (inv(t(X_hat) * X_hat) * t(X_hat) *
                   Omega_hat_2sls *
                   X_hat * inv(t(X_hat) * X_hat))
-    result = [b_hat_ols[0, 0], b_hat_2sls[0, 0],
-              Var_b_ols[0, 0], Var_b_2sls[0, 0]]
-    return [round(i, 2) for i in result]
+
+    # formatting results:
+    result = (b_hat_ols[0, 0], b_hat_2sls[0, 0],
+              Var_b_ols[0, 0], Var_b_2sls[0, 0])
+    return [round(i, 3) for i in result]
     # print('b_hat_ols:  ' + str(b_hat_ols))
     # print('b_hat_2sls: ' + str(b_hat_2sls))
     # print('Var_b_ols:  ' + str(Var_b_ols))
     # print('Var_b_2sls: ' + str(Var_b_2sls))
 
 
-LOOPS = 20
-results = np.zeros((LOOPS, 4))
-for i in range(LOOPS):
-    results[i,:] = monte_carlo(sigma_z, gamma, ro, pi)
 
-print(results)
 
+def monte_carlo(sigma_z, gamma, ro, pi, n_iterations):
+    results_Hausman = np.zeros((n_iterations, 1))
+    for i in range(n_iterations):
+        (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls) = iteration(sigma_z,
+                                                                   gamma,
+                                                                   ro, pi)
+        Hausman = (((b_hat_ols - b_hat_2sls)) ** 2 *
+                   (1 / (Var_b_2sls - Var_b_ols)))
+        results_Hausman[i, :] = Hausman
+    return results_Hausman
+
+
+
+
+Hausman_res = monte_carlo(sigma_z, gamma, ro, pi, 20)
+
+plt.hist(Hausman_res)
+plt.show()
