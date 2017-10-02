@@ -16,6 +16,7 @@ from numpy import transpose as t
 from itertools import chain
 import matplotlib.pyplot as plt
 from scipy import stats as stats
+import pandas as pd
 
 
 #%%
@@ -134,7 +135,7 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
 #%%
 
 def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
-    results_Hausman = np.zeros((n_iterations, 2))
+    results_Hausman = np.zeros((n_iterations, 3))
     for i in range(n_iterations):
         (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls, conc_par) = iteration(
             gamma, ro, pi_1, N_obs, sigma_z, r)
@@ -149,41 +150,33 @@ def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
         df = b_hat_2sls[np.abs(b_hat_2sls) < 1e8].size
         pval = stats.chi2.sf(Hausman, df)
         results_Hausman[i, 1] = pval
-    return (results_Hausman, conc_par)
+        results_Hausman[i, 2] = conc_par
+    return results_Hausman, [gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r]
 
 
 #%%
 
-Hausman_res1 = monte_carlo(gamma=0,
-                           ro=0.5,
-                           pi_1=0.4,
-                           n_iterations=1000,
-                           N_obs=100,
-                           sigma_z=2,
-                           r=3)
+Hausman_res1, parameters = monte_carlo(gamma=0,
+                                       ro=0.5,
+                                       pi_1=0.4,
+                                       n_iterations=100,
+                                       N_obs=100,
+                                       sigma_z=2,
+                                       r=3)
 
 
+used_pars = pd.DataFrame.from_items([('parameters:', parameters)], orient='index',
+                                    columns=['gamma', 'ro', 'pi_1',
+                                             'n_iterations', 'N_obs',
+                                             'sigma_z', 'r'])
+print(used_pars)
 positive_res = len(
-    np.where(Hausman_res1[0][:, 0] > stats.chi2.ppf(0.95, 1))[0])
-print('The Hausman test passed the critical value', positive_res, 'times')
-print('The concentration parameter is', Hausman_res1[1])
+    np.where(Hausman_res1[:, 0] > stats.chi2.ppf(0.95, 1))[0])
 
-plt.hist(Hausman_res1[0][:, 0], bins=40)
-plt.show()
+print('\nThe Hausman test passed the critical value ' + str(positive_res) +
+      ' times out of ' + str(parameters[3]) + ' iterations')
+print('The average concentration parameter is ' +
+      str(np.mean(Hausman_res1[:, 2])))
 
-
-#%%
-
-Hausman_res2 = monte_carlo(gamma=0,
-                           ro=0.5,
-                           pi_1=15,
-                           n_iterations=1000,
-                           N_obs=100,
-                           sigma_z=2,
-                           r=3)
-
-print(len(np.where(Hausman_res2[0][:, 0] > stats.chi2.ppf(0.95, 1))[0]))
-print('The concentration parameter is', Hausman_res2[1])
-
-plt.hist(Hausman_res2[0][:, 0], bins=40)
+plt.hist(Hausman_res1[:, 0], bins=40)
 plt.show()
