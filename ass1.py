@@ -1,8 +1,10 @@
 #%%
 
+'''
 import IPython
 app = IPython.Application.instance()
 app.kernel.do_shutdown(True)
+'''
 
 #%%
 
@@ -13,6 +15,7 @@ from numpy.linalg import *
 from numpy import transpose as t
 from itertools import chain
 import matplotlib.pyplot as plt
+from scipy import stats as stats
 
 
 #%%
@@ -100,7 +103,7 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
     # first regression
     regression_2sls_1 = linear_model.LinearRegression(fit_intercept=False)
     regression_2sls_1.fit(X=Z, y=X)
-    Pi_hat = t(np.matrix(regression_2sls_1.coef_))
+    Pi_hat = t(np.matrix([regression_2sls_1.coef_[0][0], 0, 0]))
     X_hat = Z * Pi_hat
 
     # second regression
@@ -119,8 +122,9 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
 
     # formatting results:
     result = (b_hat_ols[0, 0], b_hat_2sls[0, 0],
-              Var_b_ols[0, 0], Var_b_2sls[0, 0])
-    return [round(i, 3) for i in result]
+              Var_b_ols[0, 0], Var_b_2sls[0, 0], (pi.T * Z.T * Z * pi) 
+              / (np.sum(np.power(error_matrix[:, 1], 2)) / N_obs))
+    return [np.around(i, 3) for i in result]
     # print('b_hat_ols:  ' + str(b_hat_ols))
     # print('b_hat_2sls: ' + str(b_hat_2sls))
     # print('Var_b_ols:  ' + str(Var_b_ols))
@@ -128,11 +132,12 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
 
 
 
+#%%
 
 def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
-    results_Hausman = np.zeros((n_iterations, 1))
+    results_Hausman = np.zeros((n_iterations, 2))
     for i in range(n_iterations):
-        (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls) = iteration(gamma, ro, pi_1, N_obs, sigma_z, r)
+        (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls, conc_par) = iteration(gamma, ro, pi_1, N_obs, sigma_z, r)
         d_Var = Var_b_2sls - Var_b_ols
         if d_Var == 0:
             d_Var_psinv = 0
@@ -140,19 +145,71 @@ def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
             d_Var_psinv = 1 / d_Var
 
         Hausman = ((b_hat_ols - b_hat_2sls)) ** 2 * d_Var_psinv
-        results_Hausman[i, :] = Hausman
-    return results_Hausman
+        results_Hausman[i, 0] = Hausman
+        df = b_hat_2sls[np.abs(b_hat_2sls) < 1e8].size
+        pval = stats.chi2.sf(Hausman, df)
+        results_Hausman[i, 1] = pval
+    return (results_Hausman, conc_par)
 
 
+#%%
 
-
-Hausman_res = monte_carlo(gamma=0.5,
-                          ro=0.4,
-                          pi_1=0.6,
-                          n_iterations=200,
-                          N_obs=1000,
+Hausman_res1 = monte_carlo(gamma=0,
+                          ro=0.5,
+                          pi_1=0.4,
+                          n_iterations=1000,
+                          N_obs=100,
                           sigma_z=2,
                           r=3)
 
-plt.hist(Hausman_res, bins=40)
+
+positive_res = len(np.where(Hausman_res1[0][:, 0] > stats.chi2.ppf(0.95, 1))[0])
+print('The Hausman test passed the critical value', positive_res, 'times')
+print('The concentration parameter is', Hausman_res1[1])
+
+plt.hist(Hausman_res1[0][:, 0], bins=40)
 plt.show()
+
+
+#%%
+
+Hausman_res2 = monte_carlo(gamma=0,
+                          ro=0.5,
+                          pi_1=15,
+                          n_iterations=1000,
+                          N_obs=100,
+                          sigma_z=2,
+                          r=3)
+
+print(len(np.where(Hausman_res2[0][:, 0] > stats.chi2.ppf(0.95, 1))[0]))
+print('The concentration parameter is', Hausman_res2[1])
+
+plt.hist(Hausman_res2[0][:, 0], bins=40)
+plt.show()
+
+#%%
+    pi_1 = 1
+    r = 3
+    sigma_z = 2
+    gamma = 0
+    N_obs = 100
+    ro = 0.5
+    pi = t(np.matrix([pi_1] + [0] * (r - 1)))
+    error_matrix = errors(cov_matrix(sigma_z, gamma, ro, r), N_obs, r)
+    # u = error_matrix[:, 0]
+    # v = error_matrix[:, 1]
+
+    Z = error_matrix[:, 2:]
+    X = Z * pi + error_matrix[:, 1]
+    y = X * beta + error_matrix[:, 0]
+
+   
+
+    ###########################
+    # Two stage least squares #
+    ###########################
+
+    # first regression
+    regression_2sls_1 = linear_model.LinearRegression(fit_intercept=False)
+    regression_2sls_1.fit(X=Z, y=X)
+    Pi_hat = t(np.matrix([regression_2sls_1.coef_[0][0], 0, 0]))
