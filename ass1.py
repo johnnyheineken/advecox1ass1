@@ -123,7 +123,11 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
 
     # formatting results:
     result = (b_hat_ols[0, 0], b_hat_2sls[0, 0],
+<<<<<<< HEAD
               Var_b_ols[0, 0], Var_b_2sls[0, 0], (pi.T * Z.T * Z * pi))
+=======
+              Var_b_ols[0, 0], Var_b_2sls[0, 0], pi.T * Z.T * Z * pi)
+>>>>>>> 1c2fb5221b749c5adf6c51d7669138d248b7eabb
     return [np.around(i, 3) for i in result]
     # print('b_hat_ols:  ' + str(b_hat_ols))
     # print('b_hat_2sls: ' + str(b_hat_2sls))
@@ -155,6 +159,7 @@ def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
 
 #%%
 
+<<<<<<< HEAD
 def outcome(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
     Hausman_res, parameters = monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r)
     used_pars=pd.DataFrame.from_items([('parameters:', parameters)], orient='index',
@@ -182,6 +187,32 @@ outcome(gamma=0,
         sigma_z=2,
         r=3)
 
+=======
+Hausman_res1, parameters = monte_carlo(gamma=0,
+                                       ro=0.5,
+                                       pi_1=0.4,
+                                       n_iterations=100,
+                                       N_obs=100,
+                                       sigma_z=2,
+                                       r=3)
+
+
+used_pars = pd.DataFrame.from_items([('parameters:', parameters)], orient='index',
+                                    columns=['gamma', 'ro', 'pi_1',
+                                             'n_iterations', 'N_obs',
+                                             'sigma_z', 'r'])
+print(used_pars)
+positive_res = len(
+    np.where(Hausman_res1[:, 0] > stats.chi2.ppf(0.95, 1))[0])
+
+print('\nThe Hausman test passed the critical value ' + str(positive_res) +
+      ' times out of ' + str(parameters[3]) + ' iterations')
+print('The average concentration parameter is ' +
+      str(np.mean(Hausman_res1[:, 2])))
+
+plt.hist(Hausman_res1[:, 0], bins=40)
+plt.show()
+>>>>>>> 1c2fb5221b749c5adf6c51d7669138d248b7eabb
 
 
 #%%
