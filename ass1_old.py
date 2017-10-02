@@ -1,13 +1,3 @@
-#%%
-
-'''
-import IPython
-app = IPython.Application.instance()
-app.kernel.do_shutdown(True)
-'''
-
-#%%
-
 import numpy as np
 from sklearn import linear_model
 import math
@@ -15,10 +5,7 @@ from numpy.linalg import *
 from numpy import transpose as t
 from itertools import chain
 import matplotlib.pyplot as plt
-from scipy import stats as stats
 
-
-#%%
 
 studentname1 = 'Jan Hynek'
 studentname2 = 'Štěpán Svoboda'
@@ -82,8 +69,10 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
     ##########################
     # Ordinary least squares #
     ##########################
-    # we do not fit intercept as we know that our original model does not have intercept.
-    # however, we think that in monte carlo simulation it wont make a difference if the intercept would be zero
+    # we do not fit intercept
+    # as we know that our original model does not have intercept.
+    # however, we think that in monte carlo simulation 
+    # it wont make a difference if the intercept would be zero
     # as it is estimated as almost zero
     regression_ols = linear_model.LinearRegression(fit_intercept=False)
     regression_ols.fit(X=X, y=y)
@@ -122,22 +111,21 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
 
     # formatting results:
     result = (b_hat_ols[0, 0], b_hat_2sls[0, 0],
-              Var_b_ols[0, 0], Var_b_2sls[0, 0], (pi.T * Z.T * Z * pi) /
-              (np.sum(np.power(error_matrix[:, 1], 2)) / N_obs))
-    return [np.around(i, 3) for i in result]
+              Var_b_ols[0, 0], Var_b_2sls[0, 0])
+    return [np.round(i, 3) for i in result]
     # print('b_hat_ols:  ' + str(b_hat_ols))
     # print('b_hat_2sls: ' + str(b_hat_2sls))
     # print('Var_b_ols:  ' + str(Var_b_ols))
     # print('Var_b_2sls: ' + str(Var_b_2sls))
 
 
-#%%
+
 
 def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
-    results_Hausman = np.zeros((n_iterations, 2))
+    results_Hausman = np.zeros((n_iterations, 1))
     for i in range(n_iterations):
-        (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls, conc_par) = iteration(
-            gamma, ro, pi_1, N_obs, sigma_z, r)
+        (b_hat_ols, b_hat_2sls,
+         Var_b_ols, Var_b_2sls) = iteration(gamma, ro, pi_1, N_obs, sigma_z, r)
         d_Var = Var_b_2sls - Var_b_ols
         if d_Var == 0:
             d_Var_psinv = 0
@@ -145,45 +133,17 @@ def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
             d_Var_psinv = 1 / d_Var
 
         Hausman = ((b_hat_ols - b_hat_2sls)) ** 2 * d_Var_psinv
-        results_Hausman[i, 0] = Hausman
-        df = b_hat_2sls[np.abs(b_hat_2sls) < 1e8].size
-        pval = stats.chi2.sf(Hausman, df)
-        results_Hausman[i, 1] = pval
-    return (results_Hausman, conc_par)
+        results_Hausman[i, :] = Hausman
+    return results_Hausman
 
 
-#%%
+Hausman_res = monte_carlo(gamma=0.5,
+                          ro=0.4,
+                          pi_1=0.6,
+                          n_iterations=200,
+                          N_obs=1000,
+                          sigma_z=2,
+                          r=3)
 
-Hausman_res1 = monte_carlo(gamma=0,
-                           ro=0.5,
-                           pi_1=0.4,
-                           n_iterations=1000,
-                           N_obs=100,
-                           sigma_z=2,
-                           r=3)
-
-
-positive_res = len(
-    np.where(Hausman_res1[0][:, 0] > stats.chi2.ppf(0.95, 1))[0])
-print('The Hausman test passed the critical value', positive_res, 'times')
-print('The concentration parameter is', Hausman_res1[1])
-
-plt.hist(Hausman_res1[0][:, 0], bins=40)
-plt.show()
-
-
-#%%
-
-Hausman_res2 = monte_carlo(gamma=0,
-                           ro=0.5,
-                           pi_1=15,
-                           n_iterations=1000,
-                           N_obs=100,
-                           sigma_z=2,
-                           r=3)
-
-print(len(np.where(Hausman_res2[0][:, 0] > stats.chi2.ppf(0.95, 1))[0]))
-print('The concentration parameter is', Hausman_res2[1])
-
-plt.hist(Hausman_res2[0][:, 0], bins=40)
+plt.hist(Hausman_res, bins=40)
 plt.show()
