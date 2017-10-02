@@ -17,19 +17,19 @@ print('This is the Python output for Assignment 1, Advanced Econometrics 1 for s
       '   (2) ' + studentname2 + ' - ' + str(studentnumber2) + '\n\n' +
       '   Group n\n')
 # global variables
-N = 50
-r = 3
+# N_obs = 50
+# r = 3
 beta = 1
 
 
-sigma_z = 2
-gamma = 0.50
-ro = 0.5
-pi_1 = 0.1
-pi = t(np.matrix([pi_1] + [0] * (r - 1)))
+# sigma_z = 2
+# gamma = 0.50
+# ro = 0.5
+# pi_1 = 0.1
+# pi = t(np.matrix([pi_1] + [0] * (r - 1)))
 
 
-def cov_matrix(sigma_z, gamma, ro):
+def cov_matrix(sigma_z, gamma, ro, r):
     cov_matrix = np.identity(r + 2) * sigma_z
     cov_matrix[:, 0] = (r + 2) * [gamma]
     cov_matrix[0, :] = (r + 2) * [gamma]
@@ -43,15 +43,16 @@ def cov_matrix(sigma_z, gamma, ro):
 # defined as three values = [u, v, epsilon]
 
 
-def errors(cov_matrix):
+def errors(cov_matrix, N_obs, r):
     errors_vector = np.random.multivariate_normal(mean=[0] * (r + 2),
                                                   cov=cov_matrix,
-                                                  size=N)
+                                                  size=N_obs)
     return np.matrix(errors_vector)
 
 
-def iteration(sigma_z, gamma, ro, pi):
-    error_matrix = errors(cov_matrix(sigma_z, gamma, ro))
+def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
+    pi = t(np.matrix([pi_1] + [0] * (r - 1)))
+    error_matrix = errors(cov_matrix(sigma_z, gamma, ro, r), N_obs, r)
     # u = error_matrix[:, 0]
     # v = error_matrix[:, 1]
 
@@ -101,7 +102,7 @@ def iteration(sigma_z, gamma, ro, pi):
     # obtaining variance
     Omega_hat_2sls = np.diag(np.power(u_hat_2sls.A1, 2))
 
-    # S_hat = (t(Z) * Omega_hat_2sls * Z) / N
+    # S_hat = (t(Z) * Omega_hat_2sls * Z) / N_obs
     Var_b_2sls = (inv(t(X_hat) * X_hat) * t(X_hat) *
                   Omega_hat_2sls *
                   X_hat * inv(t(X_hat) * X_hat))
@@ -118,21 +119,30 @@ def iteration(sigma_z, gamma, ro, pi):
 
 
 
-def monte_carlo(sigma_z, gamma, ro, pi, n_iterations):
+def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
     results_Hausman = np.zeros((n_iterations, 1))
     for i in range(n_iterations):
-        (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls) = iteration(sigma_z,
-                                                                   gamma,
-                                                                   ro, pi)
-        Hausman = (((b_hat_ols - b_hat_2sls)) ** 2 *
-                   (1 / (Var_b_2sls - Var_b_ols)))
+        (b_hat_ols, b_hat_2sls, Var_b_ols, Var_b_2sls) = iteration(gamma, ro, pi_1, N_obs, sigma_z, r)
+        d_Var = Var_b_2sls - Var_b_ols
+        if d_Var == 0:
+            d_Var_psinv = 0
+        else:
+            d_Var_psinv = 1 / d_Var
+
+        Hausman = ((b_hat_ols - b_hat_2sls)) ** 2 * d_Var_psinv
         results_Hausman[i, :] = Hausman
     return results_Hausman
 
 
 
 
-Hausman_res = monte_carlo(sigma_z, gamma, ro, pi, 20)
+Hausman_res = monte_carlo(gamma=0.5,
+                          ro=0.4,
+                          pi_1=0.6,
+                          n_iterations=200,
+                          N_obs=1000,
+                          sigma_z=2,
+                          r=3)
 
-plt.hist(Hausman_res)
+plt.hist(Hausman_res, bins=40)
 plt.show()
