@@ -123,8 +123,7 @@ def iteration(gamma, ro, pi_1, N_obs, sigma_z, r):
 
     # formatting results:
     result = (b_hat_ols[0, 0], b_hat_2sls[0, 0],
-              Var_b_ols[0, 0], Var_b_2sls[0, 0], (pi.T * Z.T * Z * pi) /
-              (np.sum(np.power(error_matrix[:, 1], 2)) / N_obs))
+              Var_b_ols[0, 0], Var_b_2sls[0, 0], pi.T * Z.T * Z * pi)
     return [np.around(i, 3) for i in result]
     # print('b_hat_ols:  ' + str(b_hat_ols))
     # print('b_hat_2sls: ' + str(b_hat_2sls))
@@ -180,3 +179,26 @@ print('The average concentration parameter is ' +
 
 plt.hist(Hausman_res1[:, 0], bins=40)
 plt.show()
+
+
+#%%
+
+
+np.array([[r, N_obs, ro, gamma, pi_1],
+          [3, 50, 0, 0, 0.5], # realistic assumption is we study overidentified case, let's keep 3
+          [1, 50, 0, 0, 0.5],
+          [5, 50, 0, 0, 0.5],
+          [3, 50, 0, 0, 0.1], # weak instrument. big variance, very few rejections
+          [3, 100, 0, 0, 0.5], # more observations means higher concentration parameter
+          [3, 100, 0.25, 0, 0.1],
+          [3, 100, 0.25, 0, 0.25],
+          [3, 100, 0.25, 0, 0.5],
+          [3, 100, 0.5, 0, 0.1],
+          [3, 100, 0.5, 0, 0.25],
+          [3, 100, 0.5, 0, 0.5],
+          [3, 100, 0.25, 0.1, 0.1], # show the risks of gamma > 0
+          [3, 100, 0.25, 0.1, 0.25], # if i were to assume z is exogenous then i would come to the conclusion x is exogenous as well
+          [3, 100, 0.25, 0.1, 0.5]]) # i cannot say anything
+    
+    
+    
