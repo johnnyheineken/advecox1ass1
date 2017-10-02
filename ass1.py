@@ -189,21 +189,21 @@ outcome(gamma=0,
 #%%
 
 
-np.array([[r, N_obs, ro, gamma, pi_1],
-          [3, 50, 0, 0, 0.5], # realistic assumption is we study overidentified case, let's keep 3
-          [1, 50, 0, 0, 0.5],
-          [5, 50, 0, 0, 0.5],
-          [3, 50, 0, 0, 0.1], # weak instrument. big variance, very few rejections
-          [3, 100, 0, 0, 0.5], # more observations means higher concentration parameter
-          [3, 100, 0.25, 0, 0.1],
-          [3, 100, 0.25, 0, 0.25],
-          [3, 100, 0.25, 0, 0.5],
-          [3, 100, 0.5, 0, 0.1],
-          [3, 100, 0.5, 0, 0.25],
-          [3, 100, 0.5, 0, 0.5],
-          [3, 100, 0.25, 0.1, 0.1], # show the risks of gamma > 0
-          [3, 100, 0.25, 0.1, 0.25], # if i were to assume z is exogenous then i would come to the conclusion x is exogenous as well
-          [3, 100, 0.25, 0.1, 0.5]]) # i cannot say anything
+# np.array([[r, N_obs, ro, gamma, pi_1],
+#           [3, 50, 0, 0, 0.5], # realistic assumption is we study overidentified case, let's keep 3
+#           [1, 50, 0, 0, 0.5],
+#           [5, 50, 0, 0, 0.5],
+#           [3, 50, 0, 0, 0.1], # weak instrument. big variance, very few rejections
+#           [3, 100, 0, 0, 0.5], # more observations means higher concentration parameter
+#           [3, 100, 0.25, 0, 0.1],
+#           [3, 100, 0.25, 0, 0.25],
+#           [3, 100, 0.25, 0, 0.5],
+#           [3, 100, 0.5, 0, 0.1],
+#           [3, 100, 0.5, 0, 0.25],
+#           [3, 100, 0.5, 0, 0.5],
+#           [3, 100, 0.25, 0.1, 0.1], # show the risks of gamma > 0
+#           [3, 100, 0.25, 0.1, 0.25], # if i were to assume z is exogenous then i would come to the conclusion x is exogenous as well
+#           [3, 100, 0.25, 0.1, 0.5]]) # i cannot say anything
     
     
     
