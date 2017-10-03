@@ -178,17 +178,27 @@ def outcome(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r, histogram):
         plt.show()
 
 
-outcome(gamma=0,
-        ro=0.5,
-        pi_1=0.15,
-        n_iterations=100,
-        N_obs=200,
-        sigma_z=8,
-        r=3,
-        histogram=False)
+# outcome(gamma=0,
+#         ro=0.5,
+#         pi_1=0.15,
+#         n_iterations=100,
+#         N_obs=200,
+#         sigma_z=8,
+#         r=3,
+#         histogram=False)
 
 
 #%%
+def results(i, parameter_table, histogram):
+    return outcome(gamma=parameter_table.iloc[i, 0],
+                   ro=parameter_table.iloc[i, 1],
+                   pi_1=parameter_table.iloc[i, 2],
+                   n_iterations=parameter_table.iloc[i, 3],
+                   N_obs=parameter_table.iloc[i, 4],
+                   sigma_z=parameter_table.iloc[i, 5],
+                   r=parameter_table.iloc[i, 6],
+                   histogram=histogram)
+
 
 parameter_table = pd.DataFrame.from_items(
     [
@@ -226,11 +236,67 @@ print(
     '__________________________________________________________________\n\n' +
     '                             SECTION 1\n' +
     '__________________________________________________________________\n'
-    )
+)
 
 
 print(
     'In this section we investigate properties of parameters other than \n' +
     'gamma and ro. We set gamma and ro to zero, therefore we have situation\n' +
     'with unbiased OLS'
-    )
+)
+
+# for i in range(4):
+#     outcome(gamma=0,
+#             ro=0.5,
+#             pi_1=0.15,
+#             n_iterations=100,
+#             N_obs=200,
+# sigma_z=8,
+# r=3,
+# histogram=False)
+for i in range(5):
+    print(
+        '======= test ' + str(i+1) + ' ======='
+        )
+    results(i=i, 
+            parameter_table=parameter_table, 
+            histogram=False)
+
+print(
+    '__________________________________________________________________\n\n' +
+    '                             SECTION 2\n' +
+    '__________________________________________________________________\n'
+)
+
+
+print(
+    'In this section we investigate when ro does not equal to zero.'
+)
+
+# for i in range(5, 14):
+#     print(
+#         '======= test ' + str(i+1) + ' ======='
+#         )
+#     results(i=i, 
+#             parameter_table=parameter_table, 
+#             histogram=False)
+
+
+print(
+    '__________________________________________________________________\n\n' +
+    '                             SECTION 3\n' +
+    '__________________________________________________________________\n'
+)
+
+
+print(
+    'In this section we investigate when both ro and sigma does not equal to zero.'
+)
+
+# for i in range(14, 17):
+#     print(
+#         '======= test ' + str(i+1) + ' ======='
+#         )
+#     results(i=i, 
+#             parameter_table=parameter_table, 
+#             histogram=False)
