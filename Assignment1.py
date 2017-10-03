@@ -23,8 +23,8 @@ import pandas as pd
 
 studentname1 = 'Jan Hynek'
 studentname2 = 'Štěpán Svoboda'
-studentnumber1 = 1189
-studentnumber2 = 1188  # ŠTĚPÁNE NEZAPOMEŃ ZMĚNIT ČÍSLO
+studentnumber1 = 11748494
+studentnumber2 = 11762616  # ŠTĚPÁNE NEZAPOMEŃ ZMĚNIT ČÍSLO
 np.random.seed(studentnumber1 + 10 * studentnumber2)
 print('This is the Python output for Assignment 1, Advanced Econometrics 1 for students: \n' +
       '   (1) ' + studentname1 + ' - ' + str(studentnumber1) + '\n' +
@@ -156,11 +156,11 @@ def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
 
 #%%
 
-Hausman_res1, parameters = monte_carlo(gamma=0.1,
-                                       ro=0.2,
+Hausman_res1, parameters = monte_carlo(gamma=0,
+                                       ro=0,
                                        pi_1=0.5,
-                                       n_iterations=1000,
-                                       N_obs=100,
+                                       n_iterations=10000,
+                                       N_obs=50,
                                        sigma_z=2,
                                        r=3)
 
@@ -181,25 +181,59 @@ print('The average concentration parameter is ' +
 plt.hist(Hausman_res1[:, 0], bins=40)
 plt.show()
 
-
 #%%
 
-np.array([[r, N_obs, ro, gamma, pi_1],
-          [3, 50, 0, 0, 0.5], # realistic assumption is we study overidentified case, let's keep 3
-          [1, 50, 0, 0, 0.5],
-          [5, 50, 0, 0, 0.5],
-          [3, 50, 0, 0, 0.1], # weak instrument. big variance, very few rejections
-          [3, 100, 0, 0, 0.5], # more observations means higher concentration parameter
-          [3, 100, 0.25, 0, 0.1],
-          [3, 100, 0.25, 0, 0.25],
-          [3, 100, 0.25, 0, 0.5],
-          [3, 100, 0.5, 0, 0.1],
-          [3, 100, 0.5, 0, 0.25],
-          [3, 100, 0.5, 0, 0.5],
-          [3, 100, 0.25, 0.1, 0.1], # show the risks of gamma > 0
-          [3, 100, 0.25, 0.1, 0.25], # if i were to assume z is exogenous then i would come to the conclusion x is exogenous as well
-          [3, 100, 0.25, 0.1, 0.5]]) # i cannot say anything
-    
+Hausman_res2, parameters = monte_carlo(gamma=0,
+                                       ro=0.5,
+                                       pi_1=0.25,
+                                       n_iterations=10000,
+                                       N_obs=200,
+                                       sigma_z=2,
+                                       r=3)
+
+
+used_pars = pd.DataFrame.from_items([('parameters:', parameters)], orient='index',
+                                    columns=['gamma', 'ro', 'pi_1',
+                                             'n_iterations', 'N_obs',
+                                             'sigma_z', 'r'])
+print(used_pars)
+positive_res = len(
+    np.where(Hausman_res2[:, 0] > stats.chi2.ppf(0.95, 1))[0])
+
+print('\nThe Hausman test passed the critical value ' + str(positive_res) +
+      ' times out of ' + str(parameters[3]) + ' iterations')
+print('The average concentration parameter is ' +
+      str(np.mean(Hausman_res2[:, 2])))
+
+plt.hist(Hausman_res2[:, 0], bins=40)
+plt.show()
+
+
+
+
+#%%
+'''
+
+
+[r, N_obs, ro, gamma, pi_1],
+[3, 50, 0, 0, 0.5], # realistic assumption is we study overidentified case, let's keep 3
+[3, 200, 0, 0, 0.5], # more observations means higher concentration parameter
+[1, 200, 0, 0, 0.5],
+[5, 200, 0, 0, 0.5],
+[3, 200, 0, 0, 0.1], # weak instrument. big variance, very few rejections 
+[3, 200, 0.25, 0, 0.1],
+[3, 200, 0.25, 0, 0.25],
+[3, 200, 0.25, 0, 0.5],
+[3, 200, 0.5, 0, 0.1],
+[3, 200, 0.5, 0, 0.25],
+[3, 200, 0.5, 0, 0.5],
+[3, 200, 0.25, 0.1, 0.1], # show the risks of gamma > 0
+[3, 200, 0.25, 0.1, 0.25], # if i were to assume z is exogenous then i would come to the conclusion x is exogenous as well
+[3, 200, 0.25, 0.1, 0.5]]) # i cannot say anything
+
+
+
+'''    
     
     
     
