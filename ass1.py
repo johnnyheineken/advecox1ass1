@@ -23,8 +23,8 @@ import pandas as pd
 
 studentname1 = 'Jan Hynek'
 studentname2 = 'Štěpán Svoboda'
-studentnumber1 = 1189
-studentnumber2 = 1188  # ŠTĚPÁNE NEZAPOMEŃ ZMĚNIT ČÍSLO
+studentnumber1 = 11748494
+studentnumber2 = 11762616  # ŠTĚPÁNE NEZAPOMEŃ ZMĚNIT ČÍSLO
 np.random.seed(studentnumber1 + 10 * studentnumber2)
 print('This is the Python output for Assignment 1, Advanced Econometrics 1 for students: \n' +
       '   (1) ' + studentname1 + ' - ' + str(studentnumber1) + '\n' +
@@ -157,14 +157,15 @@ def monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
 #%%
 
 
-def outcome(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
-    Hausman_res, parameters = monte_carlo(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r)
-    used_pars=pd.DataFrame.from_items([('parameters:', parameters)], orient='index',
+def outcome(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r, histogram):
+    Hausman_res, parameters = monte_carlo(
+        gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r)
+    used_pars = pd.DataFrame.from_items([('parameters:', parameters)], orient='index',
                                         columns=['gamma', 'ro', 'pi_1',
                                                  'n_iterations', 'N_obs',
                                                  'sigma_z', 'r'])
     print(used_pars)
-    positive_res=len(
+    positive_res = len(
         np.where(Hausman_res[:, 0] > stats.chi2.ppf(0.95, 1))[0])
 
     print('\nThe Hausman test passed the critical value ' + str(positive_res) +
@@ -172,38 +173,64 @@ def outcome(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r):
     print('The average concentration parameter is ' +
           str(np.mean(Hausman_res[:, 2])))
 
-    plt.hist(Hausman_res[:, 0], bins=40)
-    plt.show()
+    if histogram:
+        plt.hist(Hausman_res[:, 0], bins=40)
+        plt.show()
 
 
 outcome(gamma=0,
-        ro=0.2,
-        pi_1=0.5,
-        n_iterations=500,
-        N_obs=50,
-        sigma_z=2,
-        r=3)
-
+        ro=0.5,
+        pi_1=0.15,
+        n_iterations=100,
+        N_obs=200,
+        sigma_z=8,
+        r=3,
+        histogram=False)
 
 
 #%%
 
+parameter_table = pd.DataFrame.from_items(
+    [
+        (1, [0, 0, 0.5, 10000, 50, 2, 3]),
+        (2, [0, 0, 0.5, 10000, 200, 2, 3]),
+        (3, [0, 0, 0.5, 10000, 200, 2, 1]),
+        (4, [0, 0, 0.5, 10000, 200, 2, 5]),
+        (5, [0, 0, 0.1, 10000, 200, 2, 3]),
+        (6, [0, 0.25, 0.1, 10000, 200, 2, 3]),
+        (7, [0, 0.25, 0.25, 10000, 200, 2, 3]),
+        (8, [0, 0.25, 0.5, 10000, 200, 2, 3]),
+        (9, [0, 0.5, 0.1, 10000, 200, 2, 3]),
+        (10, [0, 0.5, 0.25, 10000, 200, 2, 3]),
+        (11, [0, 0.5, 0.5, 10000, 200, 2, 3]),
+        (12, [0, 0.5, 0.38, 10000, 200, 2, 3]),
+        (13, [0, 0.5, 0.38, 10000, 100, 2, 3]),
+        (14, [0, 0.5, 0.38, 10000, 200, 2, 10]),
+        (15, [0.1, 0.25, 0.1, 10000, 200, 2, 3]),
+        (16, [0.1, 0.25, 0.25, 10000, 200, 2, 3]),
+        (17, [0.1, 0.25, 0.5, 10000, 200, 2, 3])
+    ],
+    orient='index',
+    columns=['gamma', 'ro', 'pi_1',
+             'n_iterations', 'N_obs',
+             'sigma_z', 'r'])
 
-# np.array([[r, N_obs, ro, gamma, pi_1],
-#           [3, 50, 0, 0, 0.5], # realistic assumption is we study overidentified case, let's keep 3
-#           [1, 50, 0, 0, 0.5],
-#           [5, 50, 0, 0, 0.5],
-#           [3, 50, 0, 0, 0.1], # weak instrument. big variance, very few rejections
-#           [3, 100, 0, 0, 0.5], # more observations means higher concentration parameter
-#           [3, 100, 0.25, 0, 0.1],
-#           [3, 100, 0.25, 0, 0.25],
-#           [3, 100, 0.25, 0, 0.5],
-#           [3, 100, 0.5, 0, 0.1],
-#           [3, 100, 0.5, 0, 0.25],
-#           [3, 100, 0.5, 0, 0.5],
-#           [3, 100, 0.25, 0.1, 0.1], # show the risks of gamma > 0
-#           [3, 100, 0.25, 0.1, 0.25], # if i were to assume z is exogenous then i would come to the conclusion x is exogenous as well
-#           [3, 100, 0.25, 0.1, 0.5]]) # i cannot say anything
-    
-    
-    
+
+#############################
+#############################
+## Presentation of results ##
+#############################
+#############################
+
+print(
+    '__________________________________________________________________\n\n' +
+    '                             SECTION 1\n' +
+    '__________________________________________________________________\n'
+    )
+
+
+print(
+    'In this section we investigate properties of parameters other than \n' +
+    'gamma and ro. We set gamma and ro to zero, therefore we have situation\n' +
+    'with unbiased OLS'
+    )
