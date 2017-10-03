@@ -189,6 +189,11 @@ def outcome(gamma, ro, pi_1, n_iterations, N_obs, sigma_z, r, histogram):
 
 
 #%%
+
+# random.seed must be in every cell where new numbers are generated as the cell structure
+# somewhat changes the way program runs in python        
+np.random.seed(studentnumber1 + 10 * studentnumber2)
+
 def results(i, parameter_table, histogram):
     return outcome(gamma=parameter_table.iloc[i, 0],
                    ro=parameter_table.iloc[i, 1],
@@ -241,7 +246,7 @@ print(
 
 print(
     'In this section we investigate properties of parameters other than \n' +
-    'gamma and ro. We set gamma and ro to zero, therefore we have situation\n' +
+    'gamma and rho. We set gamma and rho to zero, therefore we have situation\n' +
     'with unbiased OLS'
 )
 
@@ -270,16 +275,16 @@ print(
 
 
 print(
-    'In this section we investigate when ro does not equal to zero.'
+    'In this section we investigate when rho does not equal to zero.'
 )
 
-# for i in range(5, 14):
-#     print(
-#         '======= test ' + str(i+1) + ' ======='
-#         )
-#     results(i=i, 
-#             parameter_table=parameter_table, 
-#             histogram=False)
+for i in range(5, 14):
+     print(
+         '======= test ' + str(i+1) + ' ======='
+         )
+     results(i=i, 
+             parameter_table=parameter_table, 
+             histogram=False)
 
 
 print(
@@ -290,13 +295,13 @@ print(
 
 
 print(
-    'In this section we investigate when both ro and sigma does not equal to zero.'
+    'In this section we investigate when both rho and sigma do not equal to zero.'
 )
 
-# for i in range(14, 17):
-#     print(
-#         '======= test ' + str(i+1) + ' ======='
-#         )
-#     results(i=i, 
-#             parameter_table=parameter_table, 
-#             histogram=False)
+for i in range(14, 17):
+     print(
+         '======= test ' + str(i+1) + ' ======='
+         )
+     results(i=i, 
+             parameter_table=parameter_table, 
+             histogram=False)
