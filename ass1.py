@@ -84,27 +84,26 @@ def iteration(gamma, rho, pi_1, N_obs, sigma_sq_z, r):
     pi_1 = true coefficient between x and z - instrument relevance
 
     This function takes all arguments and forms errors
-    Afterwards, it forms the 'true values' of Z, X and y., from the specified
+    Afterwards, it forms the 'true values' of Z, X and y from the specified
     models.
-    Then, two regressions are computed
+    Then, two regressions are computed.
     First, we calculate OLS using sklearn linear_model and obtain b_hat_ols
-    estimator
+    estimator.
     Then, we use (X'X)^-1X'*omega_hat*X(X'X)^-1
-    to calculate variance of b_hat_ols
-    This is probably not needed
+    to calculate variance of b_hat_ols.
+    This is probably not needed as we have homoskedasticity but we opted for the
+    more general route.
 
-    Second, we calculate 2SLS estimator in two regressions
+    Second, we calculate 2SLS estimator in two regressions.
     In the first, we obtain estimator Pi_hat, which estimates the effect of
-    Z on X
+    Z on X.
     We use Pi_hat to estimate X_hat, which we afterwards use to estimate
-    to estimate y
+    to estimate y.
     We obtain estimator b_hat_2sls, and in the end
-    we calculate variance similarily
+    we calculate variance similarily.
 
     This function returns list of calculated betas and variances,
     along with concentration parameter, computated from true values.
-
-
 
     '''
     pi = t(np.matrix([pi_1] + [0] * (r - 1)))
@@ -128,7 +127,7 @@ def iteration(gamma, rho, pi_1, N_obs, sigma_sq_z, r):
     # we do not fit intercept as we know
     # that our original model does not have intercept.
     # however, we think that in monte carlo simulation
-    # it wont make a difference if the intercept would be zero
+    # it would not make a significant difference if the intercept would be zero
     # as it is estimated as almost zero
     regression_ols = linear_model.LinearRegression(fit_intercept=False)
     regression_ols.fit(X=X, y=y)
@@ -171,6 +170,7 @@ def iteration(gamma, rho, pi_1, N_obs, sigma_sq_z, r):
     result = (b_hat_ols[0, 0], b_hat_2sls[0, 0],
               Var_b_ols[0, 0], Var_b_2sls[0, 0], (pi.T * Z.T * Z * pi))
     # concentration parameter is divided by 1 - variance of v.
+    
     return [np.around(i, 3) for i in result]
     # print('b_hat_ols:  ' + str(b_hat_ols))
     # print('b_hat_2sls: ' + str(b_hat_2sls))
@@ -188,12 +188,12 @@ def monte_carlo(gamma, rho, pi_1, n_iterations, N_obs, sigma_sq_z, r):
     r = number of instruments
     N_obs = number of observations
     pi_1 = true coefficient between x and z - instrument relevance
-    n_iterations = number of iterations of Monte Carlo.
+    n_iterations = number of iterations of Monte Carlo
 
     This function basically just takes 'iterations' function and runs it
     'n_iterations' times.
     This is done to obtain the Hausman statistics from every iteration,
-    then stored in results_Hausman, along with concentation parameter
+    then stored in results_Hausman, along with concentation parameter.
 
     This function returns results of Hausman test along with parameters used 
     in the Monte Carlo simulation.
@@ -261,7 +261,7 @@ def outcome(gamma, rho, pi_1, n_iterations, N_obs, sigma_sq_z, r, histogram):
 
 # random.seed must be in every cell where new numbers are generated
 # as the cell structure somewhat changes the way program
-# runs in jupyter notebook
+# runs in jupyter notebook/spyder
 
 
 np.random.seed(studentnumber1 + 10 * studentnumber2)
