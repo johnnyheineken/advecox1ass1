@@ -379,11 +379,11 @@ for i in range(14, 17):
 
 
 # If you would like to run only one simulation - run this function.
-# outcome(gamma=0,
-#         rho=0.5,
-#         pi_1=0.15,
-#         n_iterations=100,
+# outcome(gamma=0.1,
+#         rho=0.25,
+#         pi_1=0.25,
+#         n_iterations=10000,
 #         N_obs=200,
-#         sigma_sq_z=8,
+#         sigma_sq_z=2,
 #         r=3,
 #         histogram=False)
