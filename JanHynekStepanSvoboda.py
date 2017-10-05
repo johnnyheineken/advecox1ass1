@@ -28,7 +28,7 @@ print('This is the Python output for Assignment 1, Advanced Econometrics 1 ' +
       'for students: \n' +
       '   (1) ' + studentname1 + ' - ' + str(studentnumber1) + '\n' +
       '   (2) ' + studentname2 + ' - ' + str(studentnumber2) + '\n\n' +
-      '   Group _placeholder_\n')
+      '   Group 7\n')
 
 
 # global variables
