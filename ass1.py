@@ -195,7 +195,7 @@ def monte_carlo(gamma, rho, pi_1, n_iterations, N_obs, sigma_sq_z, r):
     This is done to obtain the Hausman statistics from every iteration,
     then stored in results_Hausman, along with concentation parameter.
 
-    This function returns results of Hausman test along with parameters used 
+    This function returns results of Hausman test along with parameters used
     in the Monte Carlo simulation.
     '''
     results_Hausman = np.zeros((n_iterations, 3))
@@ -247,7 +247,7 @@ def outcome(gamma, rho, pi_1, n_iterations, N_obs, sigma_sq_z, r, histogram):
     positive_res = len(
         np.where(Hausman_result[:, 0] > stats.chi2.ppf(0.95, 1))[0])
 
-    print('\nThe Hausman test passed the critical value ' + str(positive_res) +
+    print('\nThe Hausman test passed the critical value for p-value 0.05 ' + str(positive_res) +
           ' times out of ' + str(parameters[3]) + ' iterations')
     print('The average concentration parameter is ' +
           str(np.mean(Hausman_result[:, 2])))
