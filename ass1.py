@@ -300,9 +300,8 @@ parameter_table = pd.DataFrame.from_items(
         (12, [0, 0.5, 0.38, 10000, 200, 2, 3]),
         (13, [0, 0.5, 0.38, 10000, 100, 2, 3]),
         (14, [0, 0.5, 0.38, 10000, 200, 2, 10]),
-        (15, [0.1, 0.25, 0.1, 10000, 200, 2, 3]),
-        (16, [0.1, 0.25, 0.25, 10000, 200, 2, 3]),
-        (17, [0.1, 0.25, 0.5, 10000, 200, 2, 3])
+        (15, [0.1, 0.1, 0.5, 10000, 200, 2, 3]),
+        (16, [0.2, 0.2, 0.5, 10000, 200, 2, 3]),
     ],
     orient='index',
     columns=['gamma', 'rho', 'pi_1',
@@ -369,7 +368,7 @@ print(
     'In this section we investigate when both rho and sigma do not equal to zero.'
 )
 
-for i in range(14, 17):
+for i in range(14, 16):
     print(
         '======= test ' + str(i + 1) + ' ======='
     )
